@@ -2,6 +2,15 @@ name: Automated tests
 
 on:
   workflow_dispatch:
+    inputs:
+      deployment_target:
+        description: Deployment targets (choose one)
+        required: true
+        default: all_tests
+        type: choice
+        options:
+          - all_tests
+          - regression
 
 
 jobs:
@@ -19,6 +28,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Test with pytest
+    - name: All tests
+      if: "'all_tests' == github.event.inputs.deployment_target"
       run: |
         pytest -v
+    - name: Regression
+      if: "'regression' == github.event.inputs.deployment_target"
+      run: |
+        pytest -v -m regression
